@@ -20,13 +20,14 @@ def extract_features(INPUT_FILE_1, INPUT_FILE_2, OUTPUT_FILE):
         lines = f.read().splitlines()
         for line in random.sample(lines, 1000):
             #print line
-            try:
-                line = urllib.unquote(line).decode('utf-8')
-            except UnicodeDecodeError:
-                try:
-                    line = urllib.unquote(line).decode('cp1251')
-                except UnicodeDecodeError:
-                    pass
+            # try:
+            #     line = urllib.unquote(line).decode('utf-8')
+            # except UnicodeDecodeError:
+            #     try:
+            #         line = urllib.unquote(line).decode('cp1251')
+            #     except UnicodeDecodeError:
+            #         pass
+            line = urllib.unquote(line)
             #print line
             line = line[line.find('.'):]
             num1 = line.count('/') - int(line[len(line) - 1] == '/')
@@ -103,7 +104,7 @@ def extract_features(INPUT_FILE_1, INPUT_FILE_2, OUTPUT_FILE):
                 # features[s] = features.setdefault(s, 0) + 1
 
                 # 4b
-                res = digits.match(segment)
+                res = digits.match(line)
                 if res:
                     s = 'segment_[0-9]_' + str(idx) + ':1'
                     features[s] = features.setdefault(s, 0) + 1
@@ -146,10 +147,10 @@ def extract_features(INPUT_FILE_1, INPUT_FILE_2, OUTPUT_FILE):
     for feature in dict_delete:
         features.pop(feature)
 
-    res = sorted(features.items(), key = itemgetter(1), reverse=True)
+    features = dict(sorted(features.items(), key = itemgetter(1), reverse=True))
     f = open(OUTPUT_FILE, 'w')
-    for idx in range(len(res)):
-        f.write(res[idx][0] + '\t' + str(res[idx][1]) + '\n')
+    for it in features.items():
+        f.write(str(it[0]) + '\t' + str(it[1]) + '\n')
     f.close()
 
-extract_features('data/urls.wikipedia.examined', 'data/urls.wikipedia.general', 'result/wikipedia.res')
+#extract_features('data/urls.wikipedia.examined', 'data/urls.wikipedia.general', 'result/wikipedia.res')
